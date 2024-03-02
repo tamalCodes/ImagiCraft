@@ -1,12 +1,14 @@
 "use client";
 
 import { updateImageUrl } from "@/redux/slice/imageSlice";
+import { RxCross1 } from "react-icons/rx";
 import { useDispatch, useSelector } from "react-redux";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 
 const ImageEditor = () => {
   const image = useSelector((state) => state.image);
+  const filters = useSelector((state) => state.image.filters);
   const dispatch = useDispatch();
 
   const readImage = (e) => {
@@ -27,17 +29,30 @@ const ImageEditor = () => {
       <Sidebar />
 
       <div className="p-4 sm:ml-64">
-        <div className="border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700 mt-14 h-[88vh] ">
+        <div className="border-2 border-gray-400 border-dashed rounded-lg dark:border-gray-700 mt-14 h-[88vh] relative">
+          {image.url !== "" && (
+            <RxCross1
+              className="absolute -right-2 -top-2 bg-white rounded-full  border-solid border-2 border-red-500 w-[25px] h-[25px] p-1 cursor-pointer"
+              onClick={() => {
+                dispatch(updateImageUrl(""));
+              }}
+            />
+          )}
+
           {image.url ? (
             <img
               src={image.url}
               alt="image"
               className="w-full h-full object-contain"
               id="my-node"
+              style={{
+                filter: `brightness(${filters?.brightness?.value}%)  saturate(${filters?.saturate?.value}%) contrast(${filters?.contrast?.value}%) grayscale(${filters?.grayscale?.value}%)`,
+                // transform: `rotate(${state.rotate}deg) scale(${state.vartical},${state.horizental})`,
+              }}
             />
           ) : (
             <label
-              className="flex items-center justify-center h-full rounded bg-gray-100 dark:bg-gray-100 cursor-pointer"
+              className="flex flex-col items-center justify-center h-full rounded-lg bg-gray-100 dark:bg-gray-100 cursor-pointer"
               htmlFor="choose"
             >
               <div className="text-2xl text-gray-600 dark:text-gray-500">
@@ -57,6 +72,9 @@ const ImageEditor = () => {
                   />
                 </svg>
               </div>
+              <span className="font-normal text-[1.2rem] font-outfit text-gray-500">
+                Choose Image
+              </span>
               <input
                 type="file"
                 onChange={readImage}

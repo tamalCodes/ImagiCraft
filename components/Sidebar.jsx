@@ -1,12 +1,12 @@
 "use client";
-import { updateImageUrl } from "@/redux/slice/imageSlice";
-import { useEffect, useState } from "react";
-// import FileSaver from "file-saver";
-// import * as htmlToImage from "html-to-image";
-// import { FaPlus, FaRegSave, FaTimesCircle } from "react-icons/fa";
 import { Toggle } from "@/components/ui/toggle";
+import { updateImageFilters } from "@/redux/slice/imageSlice";
 import { FontBoldIcon, FontItalicIcon } from "@radix-ui/react-icons";
+import FileSaver from "file-saver";
 import { AnimatePresence, motion } from "framer-motion";
+import * as htmlToImage from "html-to-image";
+import { useEffect, useState } from "react";
+import { LuSave, LuUndo } from "react-icons/lu";
 import {
   MdOutlineRotate90DegreesCcw,
   MdOutlineRotate90DegreesCw,
@@ -15,28 +15,15 @@ import { useDispatch, useSelector } from "react-redux";
 
 const Sidebar = () => {
   const dispatch = useDispatch();
-  const [showTextOverlay, setshowTextOverlay] = useState(false);
-  const options = [
-    { value: "Thin", label: "Thin" },
-    { value: "Normal", label: "Normal" },
-    { value: "Bold", label: "Bold" },
-    { value: "Dark", label: "Dark" },
-  ];
-
-  const readImage = (e) => {
-    if (e.target.files.length !== 0) {
-      const reader = new FileReader();
-
-      reader.onload = () => {
-        dispatch(updateImageUrl(reader.result));
-      };
-      reader.readAsDataURL(e.target.files[0]);
-    }
-  };
-
   const image = useSelector((state) => state.image);
+  const filters = useSelector((state) => state.image.filters);
+
+  const [showTextOverlay, setshowTextOverlay] = useState(
+    image.url === "" ? false : true
+  );
 
   const [color, setColor] = useState("#2563eb");
+  const [activeFilter, setactiveFilter] = useState("");
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -53,7 +40,9 @@ const Sidebar = () => {
   return (
     <aside
       id="logo-sidebar"
-      className="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700"
+      className={`fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700 ${
+        image.url === "" && "pointer-events-none opacity-50"
+      }`}
       aria-label="Sidebar"
     >
       <div className="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
@@ -62,11 +51,11 @@ const Sidebar = () => {
             <label className="inline-flex items-center cursor-pointer">
               <input
                 type="checkbox"
-                value=""
                 className="sr-only peer"
                 onChange={() => {
                   setshowTextOverlay(!showTextOverlay);
                 }}
+                checked={showTextOverlay}
               />
               <div className="relative w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-green-600 "></div>
               <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300 font-poppins">
@@ -141,77 +130,106 @@ const Sidebar = () => {
             </AnimatePresence>
           </li>
 
-          <li className="rounded-lg flex gap-2 items-center justify-between ">
-            <div className="w-[120px] aspect-square h-[38.6px] bg-transparent font-outfit border-solid border-2 border-gray-400 rounded-md text-black font-medium focus:outline-none px-2 flex flex-col items-center cursor-pointer">
-              <MdOutlineRotate90DegreesCcw className="text-[20px] text-center my-auto" />
-            </div>
-            <div className="w-[120px] aspect-square h-[38.6px] bg-transparent font-outfit border-solid border-2 border-gray-400 rounded-md text-black font-medium focus:outline-none px-2 flex flex-col items-center cursor-pointer">
-              <MdOutlineRotate90DegreesCw className="text-[20px] text-center my-auto" />
-            </div>
-          </li>
-
-          <li className="rounded-lg flex gap-2 items-center justify-between ">
-            <div className="w-[120px] aspect-square h-[38.6px] bg-transparent font-outfit border-solid border-2 border-gray-400 rounded-md text-black font-normal focus:outline-none px-2 flex flex-col items-center cursor-pointer">
-              <p className="text-[18px] text-center my-auto">Brightness</p>
+          <li className="rounded-lg flex gap-2 items-center justify-between px-4 flex-wrap bg-[#f9f7ec] py-4">
+            <div className="w-[100px] aspect-square h-[38.6px] bg-transparent font-outfit border-solid border-2 border-gray-400 rounded-md text-black font-medium focus:outline-none px-2 flex flex-col items-center cursor-pointer">
+              <MdOutlineRotate90DegreesCcw className="text-[17px] text-center my-auto" />
             </div>
 
-            <div className="w-[120px] aspect-square h-[38.6px] bg-transparent font-outfit border-solid border-2 border-gray-400 rounded-md text-black font-normal focus:outline-none px-2 flex flex-col items-center cursor-pointer">
-              <p className="text-[18px] text-center my-auto">Grayscale</p>
-            </div>
-          </li>
-          <li className="rounded-lg flex gap-2 items-center justify-between ">
-            <div className="w-[120px] aspect-square h-[38.6px] bg-transparent font-outfit border-solid border-2 border-gray-400 rounded-md text-black font-normal focus:outline-none px-2 flex flex-col items-center cursor-pointer">
-              <p className="text-[18px] text-center my-auto">Contrast</p>
+            <div className="w-[100px] aspect-square h-[38.6px] bg-transparent font-outfit border-solid border-2 border-gray-400 rounded-md text-black font-medium focus:outline-none px-2 flex flex-col items-center cursor-pointer">
+              <MdOutlineRotate90DegreesCw className="text-[17px] text-center my-auto" />
             </div>
 
-            <div className="w-[120px] aspect-square h-[38.6px] bg-transparent font-outfit border-solid border-2 border-gray-400 rounded-md text-black font-normal focus:outline-none px-2 flex flex-col items-center cursor-pointer">
-              <p className="text-[18px] text-center my-auto">Saturate</p>
+            <div
+              className={`w-[100px] aspect-square h-[38.6px]  font-outfit border-solid border-2 border-gray-400 rounded-md text-black font-normal focus:outline-none px-2 flex flex-col items-center cursor-pointer ${
+                activeFilter === "brightness" && "text-white bg-black"
+              }`}
+              onClick={() =>
+                setactiveFilter(
+                  activeFilter === "brightness" ? "" : "brightness"
+                )
+              }
+            >
+              <p className="text-[16px] text-center my-auto">Brightness</p>
             </div>
-          </li>
-          <li className="rounded-lg flex gap-2 items-center justify-between ">
-          <input id="default-range" type="range" value="50" className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"/>
+
+            <div
+              className={`w-[100px] aspect-square h-[38.6px]  font-outfit border-solid border-2 border-gray-400 rounded-md text-black font-normal focus:outline-none px-2 flex flex-col items-center cursor-pointer ${
+                activeFilter === "grayscale" && "text-white bg-black"
+              }`}
+              onClick={() =>
+                setactiveFilter(activeFilter === "grayscale" ? "" : "grayscale")
+              }
+            >
+              <p className="text-[16px] text-center my-auto">Grayscale</p>
+            </div>
+
+            <div
+              className={`w-[100px] aspect-square h-[38.6px]  font-outfit border-solid border-2 border-gray-400 rounded-md text-black font-normal focus:outline-none px-2 flex flex-col items-center cursor-pointer ${
+                activeFilter === "contrast" && "text-white bg-black"
+              }`}
+              onClick={() =>
+                setactiveFilter(activeFilter === "contrast" ? "" : "contrast")
+              }
+            >
+              <p className="text-[16px] text-center my-auto">Contrast</p>
+            </div>
+
+            <div
+              className={`w-[100px] aspect-square h-[38.6px]  font-outfit border-solid border-2 border-gray-400 rounded-md text-black font-normal focus:outline-none px-2 flex flex-col items-center cursor-pointer ${
+                activeFilter === "saturate" && "text-white bg-black"
+              }`}
+              onClick={() =>
+                setactiveFilter(activeFilter === "saturate" ? "" : "saturate")
+              }
+            >
+              <p className="text-[16px] text-center my-auto">Saturate</p>
+            </div>
+
+            <input
+              id="default-range"
+              type="range"
+              min={0}
+              max={200}
+              defaultValue={filters[activeFilter]?.value || 0}
+              value={filters[activeFilter]?.value || 0}
+              className={`w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 mt-4 ${
+                activeFilter === "" && "opacity-50 pointer-events-none"
+              }`}
+              onChange={(e) => {
+                dispatch(
+                  updateImageFilters({
+                    filterName: activeFilter,
+                    value: e.target.value,
+                  })
+                );
+              }}
+            />
           </li>
 
-          {/* {image.url === "" ? (
-            <li>
-              <label
-                htmlFor="choose"
-                className="font-poppins bg-blue-400 flex p-2 items-center justify-center gap-3 rounded-lg cursor-pointer mt-10"
-              >
-                <FaPlus className="m-0 -mt-[3px]" /> Choose Image
-              </label>
-              <input
-                type="file"
-                onChange={readImage}
-                id="choose"
-                className="hidden"
-              />
-            </li>
-          ) : (
-            <li>
-              <p
-                htmlFor="choose"
-                className="font-poppins bg-blue-400 flex p-2 items-center justify-center gap-3 rounded-lg cursor-pointer mt-10"
-                onClick={() => {
-                  htmlToImage
-                    .toBlob(document.getElementById("my-node"))
-                    .then(function (blob) {
-                      if (window.saveAs) {
-                        window.saveAs(blob, "my-node.png");
-                      } else {
-                        FileSaver.saveAs(blob, "my-node.png");
-                      }
-                    });
-                }}
-              >
-                <FaRegSave className="m-0 -mt-[3px]" /> Save Image
-              </p>
+          {image.url !== "" && (
+            <li
+              className="font-outfit font-normal bg-[#0079FF] text-white  flex p-2 items-center justify-center gap-3 rounded-lg cursor-pointer"
+              onClick={() => {
+                htmlToImage
+                  .toBlob(document.getElementById("my-node"))
+                  .then(function (blob) {
+                    if (window.saveAs) {
+                      window.saveAs(blob, "my-node.png");
+                    } else {
+                      FileSaver.saveAs(blob, "my-node.png");
+                    }
+                  });
+              }}
+            >
+              <LuSave className="m-0  text-[26px]" /> Save Image
             </li>
           )}
 
-          <li className="font-poppins bg-red-600 flex p-2 items-center justify-center gap-3 rounded-lg cursor-pointer">
-            <FaTimesCircle className="m-0 -mt-[3px] " /> Delete Image
-          </li> */}
+          {filters.length !== 0 && (
+            <li className="font-outfit font-normal bg-[#FE0000] text-white  flex p-2 items-center justify-center gap-3 rounded-lg cursor-pointer">
+              <LuUndo className="m-0  text-[26px]" /> Reset Filters
+            </li>
+          )}
         </ul>
       </div>
     </aside>
