@@ -8,7 +8,21 @@ const initialState = {
     saturate: { value: 100 },
     contrast: { value: 100 },
   },
-  activeFilter: {},
+
+  textOverlay: false,
+  textOverlayOptions: {
+    top: 50,
+    left: 50,
+    transform: "translate(-50%, -50%)",
+    color: "white",
+    fontSize: 18,
+    bold: false,
+    italic: false,
+    color: "#fff",
+    value: "Hello",
+  },
+
+  rotate: 0,
 };
 
 const imageSlice = createSlice({
@@ -19,26 +33,34 @@ const imageSlice = createSlice({
       state.url = action.payload;
     },
 
-    setActiveFilter: (state, action) => {
-      state.activeFilter = action.payload;
-    },
-
     updateImageFilters: (state, action) => {
       const { filterName, value } = action.payload;
       state.filters[filterName] = { value };
     },
 
-    resetImageFilters: (state) => {
+    resetImageOptions: (state) => {
       state.filters = initialState.filters;
-      state.activeFilter = {};
+      state.textOverlay = initialState.textOverlay;
+      state.textOverlayOptions = initialState.textOverlayOptions;
+      state.rotate = initialState.rotate;
+    },
+
+    toggleTextOverlay: (state) => {
+      state.textOverlay = !state.textOverlay;
+    },
+
+    updateTextoverlayFilters: (state, action) => {
+      const { filterName, value } = action.payload;
+      state.textOverlayOptions[filterName] = value;
     },
   },
 });
 
 export const {
   updateImageUrl,
-  resetImageFilters,
-  setActiveFilter,
+  resetImageOptions,
   updateImageFilters,
+  toggleTextOverlay,
+  updateTextoverlayFilters,
 } = imageSlice.actions;
 export default imageSlice.reducer;

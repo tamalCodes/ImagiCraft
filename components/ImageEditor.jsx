@@ -8,6 +8,10 @@ import Sidebar from "./Sidebar";
 
 const ImageEditor = () => {
   const image = useSelector((state) => state.image);
+  const textOverlay = useSelector((state) => state.image.textOverlay);
+  const textOverlayOptions = useSelector(
+    (state) => state.image.textOverlayOptions
+  );
   const filters = useSelector((state) => state.image.filters);
   const dispatch = useDispatch();
 
@@ -29,10 +33,10 @@ const ImageEditor = () => {
       <Sidebar />
 
       <div className="p-4 sm:ml-64">
-        <div className="border-2 border-gray-400 border-dashed rounded-lg dark:border-gray-700 mt-14 h-[88vh] relative">
+        <div className="border-2 border-gray-400 border-dashed  dark:border-gray-700 mt-14 h-[88vh] relative">
           {image.url !== "" && (
             <RxCross1
-              className="absolute -right-2 -top-2 bg-white rounded-full  border-solid border-2 border-red-500 w-[25px] h-[25px] p-1 cursor-pointer"
+              className="absolute -right-2 -top-2 bg-white rounded-full  border-solid border-2 border-red-500 w-[25px] h-[25px] p-1 cursor-pointer z-20"
               onClick={() => {
                 dispatch(updateImageUrl(""));
               }}
@@ -40,16 +44,33 @@ const ImageEditor = () => {
           )}
 
           {image.url ? (
-            <img
-              src={image.url}
-              alt="image"
-              className="w-full h-full object-contain"
-              id="my-node"
-              style={{
-                filter: `brightness(${filters?.brightness?.value}%)  saturate(${filters?.saturate?.value}%) contrast(${filters?.contrast?.value}%) grayscale(${filters?.grayscale?.value}%)`,
-                // transform: `rotate(${state.rotate}deg) scale(${state.vartical},${state.horizental})`,
-              }}
-            />
+            <div id="my-node" className="relative">
+              <img
+                src={image.url}
+                alt="image"
+                className="w-full h-full max-h-[88vh] object-contain"
+                style={{
+                  filter: `brightness(${filters?.brightness?.value}%)  saturate(${filters?.saturate?.value}%) contrast(${filters?.contrast?.value}%) grayscale(${filters?.grayscale?.value}%)`,
+                  // transform: `rotate(${state.rotate}deg) scale(${state.vartical},${state.horizental})`,
+                }}
+              />
+              {textOverlay && (
+                <span
+                  className="absolute font-outfit text-nowrap"
+                  style={{
+                    top: `${textOverlayOptions.top}%`,
+                    left: `${textOverlayOptions.left}%`,
+                    transform: "translate(-50%, -50%)",
+                    color: textOverlayOptions.color,
+                    fontSize: `${textOverlayOptions.fontSize}px`,
+                    fontWeight: textOverlayOptions.bold ? "bold" : "normal",
+                    fontStyle: textOverlayOptions.italic ? "italic" : "normal",
+                  }}
+                >
+                  {textOverlayOptions.value}
+                </span>
+              )}
+            </div>
           ) : (
             <label
               className="flex flex-col items-center justify-center h-full rounded-lg bg-gray-100 dark:bg-gray-100 cursor-pointer"

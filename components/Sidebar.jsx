@@ -1,6 +1,12 @@
 "use client";
 import { Toggle } from "@/components/ui/toggle";
-import { updateImageFilters } from "@/redux/slice/imageSlice";
+import {
+  resetImageFilters,
+  resetImageOptions,
+  toggleTextOverlay,
+  updateImageFilters,
+  updateTextoverlayFilters,
+} from "@/redux/slice/imageSlice";
 import { FontBoldIcon, FontItalicIcon } from "@radix-ui/react-icons";
 import FileSaver from "file-saver";
 import { AnimatePresence, motion } from "framer-motion";
@@ -17,9 +23,9 @@ const Sidebar = () => {
   const dispatch = useDispatch();
   const image = useSelector((state) => state.image);
   const filters = useSelector((state) => state.image.filters);
-
-  const [showTextOverlay, setshowTextOverlay] = useState(
-    image.url === "" ? false : true
+  const textOverlay = useSelector((state) => state.image.textOverlay);
+  const textOverlayOptions = useSelector(
+    (state) => state.image.textOverlayOptions
   );
 
   const [color, setColor] = useState("#2563eb");
@@ -27,8 +33,13 @@ const Sidebar = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      console.log(color);
-    }, 500);
+      dispatch(
+        updateTextoverlayFilters({
+          filterName: "color",
+          value: color,
+        })
+      );
+    }, 100);
 
     return () => clearTimeout(timer);
   }, [color]);
@@ -53,9 +64,10 @@ const Sidebar = () => {
                 type="checkbox"
                 className="sr-only peer"
                 onChange={() => {
-                  setshowTextOverlay(!showTextOverlay);
+                  dispatch(toggleTextOverlay());
                 }}
-                checked={showTextOverlay}
+                checked={textOverlay}
+                value={textOverlay}
               />
               <div className="relative w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-green-600 "></div>
               <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300 font-poppins">
@@ -64,7 +76,7 @@ const Sidebar = () => {
             </label>
 
             <AnimatePresence>
-              {showTextOverlay && (
+              {textOverlay && (
                 <motion.div
                   className="w-full max-w-full p-1 mt-3"
                   initial={{
@@ -88,39 +100,128 @@ const Sidebar = () => {
                     <div className="flex gap-2 items-center justify-between">
                       <input
                         type="number"
-                        max={50}
+                        max={100}
                         name=""
                         id=""
                         className="w-[44px] aspect-square h-[38.6px] bg-transparent font-outfit border-solid border-2 border-gray-400 rounded-md text-black font-medium focus:outline-none px-2 text-[15px] text-center"
-                        value={18}
+                        value={textOverlayOptions["fontSize"]}
                         onChange={(e) => {
-                          e.target.value = Math.min(e.target.value, 50);
+                          e.target.value = Math.min(e.target.value, 100);
+                          dispatch(
+                            updateTextoverlayFilters({
+                              filterName: "fontSize",
+                              value: e.target.value,
+                            })
+                          );
                         }}
                       />
-                      <Toggle variant="outline" aria-label="Toggle italic">
-                        <FontBoldIcon className="h-4 w-4" />
-                      </Toggle>
-                      <Toggle variant="outline" aria-label="Toggle italic">
-                        <FontItalicIcon className="h-4 w-4" />
-                      </Toggle>
+
+                      <div
+                        className={`w-[40px] aspect-square h-[38.6px]  font-outfit border-solid border-2 border-gray-400 rounded-md text-black font-normal focus:outline-none px-2 flex flex-col items-center cursor-pointer ${
+                          textOverlayOptions.bold && "text-white bg-black"
+                        }`}
+                        onClick={() =>
+                          dispatch(
+                            updateTextoverlayFilters({
+                              filterName: "bold",
+                              value: !textOverlayOptions.bold,
+                            })
+                          )
+                        }
+                      >
+                        <FontBoldIcon className="my-auto mx-auto" />
+                      </div>
+
+                      <div
+                        className={`w-[40px] aspect-square h-[38.6px]  font-outfit border-solid border-2 border-gray-400 rounded-md text-black font-normal focus:outline-none px-2 flex flex-col items-center cursor-pointer ${
+                          textOverlayOptions.italic && "text-white bg-black"
+                        }`}
+                        onClick={() =>
+                          dispatch(
+                            updateTextoverlayFilters({
+                              filterName: "italic",
+                              value: !textOverlayOptions.italic,
+                            })
+                          )
+                        }
+                      >
+                        <FontItalicIcon className="my-auto mx-auto" />
+                      </div>
+
                       <input
                         type="color"
                         className="p-1 block border-gray-400 border-solid border-2  rounded-md text-black cursor-pointer w-[44px] aspect-square h-[38.6px] bg-transparent"
                         id="hs-color-input"
-                        value={color}
+                        value={textOverlayOptions.color}
                         title="Choose your color"
-                        onChange={handleChange}
+                        onChange={(e) => {
+                          dispatch(
+                            updateTextoverlayFilters({
+                              filterName: "color",
+                              value: e.target.value,
+                            })
+                          );
+                        }}
                       />
                     </div>
+
                     <div className="flex gap-2 items-center">
                       <input
                         type="text"
                         name=""
                         id=""
                         className="bg-transparent font-outfit border-solid border-2 border-gray-400 rounded-md text-black font-medium focus:outline-none px-2 text-[15px] h-9 w-[100%]"
-                        value={"Hello"}
+                        value={textOverlayOptions["value"]}
                         onChange={(e) => {
-                          e.target.value = Math.min(e.target.value, 50);
+                          dispatch(
+                            updateTextoverlayFilters({
+                              filterName: "value",
+                              value: e.target.value,
+                            })
+                          );
+                        }}
+                      />
+                    </div>
+
+                    <div className="flex gap-2 items-center">
+                      <span className="font-outfit font-normal">Vertical</span>
+                      <input
+                        id="default-range"
+                        type="range"
+                        min={0}
+                        max={100}
+                        defaultValue={textOverlayOptions["top"]}
+                        value={textOverlayOptions["top"]}
+                        className={`w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 mt-[6px]`}
+                        onChange={(e) => {
+                          dispatch(
+                            updateTextoverlayFilters({
+                              filterName: "top",
+                              value: e.target.value,
+                            })
+                          );
+                        }}
+                      />
+                    </div>
+                    <div className="flex gap-2 items-center">
+                      <span className="font-outfit font-normal">
+                        Horizontal
+                      </span>
+                      <input
+                        id="default-range"
+                        type="range"
+                        min={0}
+                        max={100}
+                        defaultValue={textOverlayOptions["left"]}
+                        value={textOverlayOptions["left"]}
+                        className={`w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 mt-[6px]`}
+                        onChange={(e) => {
+                          dispatch(
+                            updateTextoverlayFilters({
+                              filterName: "left",
+                              value: e.target.value,
+                            })
+                          );
                         }}
                       />
                     </div>
@@ -226,7 +327,13 @@ const Sidebar = () => {
           )}
 
           {filters.length !== 0 && (
-            <li className="font-outfit font-normal bg-[#FE0000] text-white  flex p-2 items-center justify-center gap-3 rounded-lg cursor-pointer">
+            <li
+              className="font-outfit font-normal bg-[#FE0000] text-white  flex p-2 items-center justify-center gap-3 rounded-lg cursor-pointer"
+              onClick={() => {
+                dispatch(resetImageOptions());
+                setactiveFilter("");
+              }}
+            >
               <LuUndo className="m-0  text-[26px]" /> Reset Filters
             </li>
           )}
