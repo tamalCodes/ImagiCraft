@@ -232,13 +232,33 @@ const Sidebar = () => {
           </li>
 
           <li className="rounded-lg flex gap-2 items-center justify-between px-4 flex-wrap bg-[#f9f7ec] py-4">
-            <div className="w-[100px] aspect-square h-[38.6px] bg-transparent font-outfit border-solid border-2 border-gray-400 rounded-md text-black font-medium focus:outline-none px-2 flex flex-col items-center cursor-pointer">
+            {/* <div
+              className="w-[100px] aspect-square h-[38.6px] bg-transparent font-outfit border-solid border-2 border-gray-400 rounded-md text-black font-medium focus:outline-none px-2 flex flex-col items-center cursor-pointer"
+              onClick={() => {
+                dispatch(
+                  updateImageFilters({
+                    filterName: "rotate",
+                    value: filters["rotate"] - 90,
+                  })
+                );
+              }}
+            >
               <MdOutlineRotate90DegreesCcw className="text-[17px] text-center my-auto" />
             </div>
 
-            <div className="w-[100px] aspect-square h-[38.6px] bg-transparent font-outfit border-solid border-2 border-gray-400 rounded-md text-black font-medium focus:outline-none px-2 flex flex-col items-center cursor-pointer">
+            <div
+              className="w-[100px] aspect-square h-[38.6px] bg-transparent font-outfit border-solid border-2 border-gray-400 rounded-md text-black font-medium focus:outline-none px-2 flex flex-col items-center cursor-pointer"
+              onClick={() => {
+                dispatch(
+                  updateImageFilters({
+                    filterName: "rotate",
+                    value: filters["rotate"] + 90,
+                  })
+                );
+              }}
+            >
               <MdOutlineRotate90DegreesCw className="text-[17px] text-center my-auto" />
-            </div>
+            </div> */}
 
             <div
               className={`w-[100px] aspect-square h-[38.6px]  font-outfit border-solid border-2 border-gray-400 rounded-md text-black font-normal focus:outline-none px-2 flex flex-col items-center cursor-pointer ${
@@ -291,8 +311,8 @@ const Sidebar = () => {
               type="range"
               min={0}
               max={200}
-              defaultValue={filters[activeFilter]?.value || 0}
-              value={filters[activeFilter]?.value || 0}
+              defaultValue={filters[activeFilter] || 0}
+              value={filters[activeFilter]}
               className={`w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 mt-4 ${
                 activeFilter === "" && "opacity-50 pointer-events-none"
               }`}

@@ -50,8 +50,8 @@ const ImageEditor = () => {
                 alt="image"
                 className="w-full h-full max-h-[88vh] object-contain"
                 style={{
-                  filter: `brightness(${filters?.brightness?.value}%)  saturate(${filters?.saturate?.value}%) contrast(${filters?.contrast?.value}%) grayscale(${filters?.grayscale?.value}%)`,
-                  // transform: `rotate(${state.rotate}deg) scale(${state.vartical},${state.horizental})`,
+                  filter: `brightness(${filters?.brightness}%)  saturate(${filters?.saturate}%) contrast(${filters?.contrast}%) grayscale(${filters?.grayscale}%)`,
+                  transform: `rotate(${filters?.rotate}deg)`,
                 }}
               />
               {textOverlay && (

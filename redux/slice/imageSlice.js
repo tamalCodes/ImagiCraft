@@ -3,10 +3,11 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   url: "",
   filters: {
-    brightness: { value: 100 },
-    grayscale: { value: 0 },
-    saturate: { value: 100 },
-    contrast: { value: 100 },
+    brightness: 100,
+    grayscale: 0,
+    saturate: 100,
+    contrast: 100,
+    rotate: 0,
   },
 
   textOverlay: false,
@@ -21,8 +22,6 @@ const initialState = {
     color: "#fff",
     value: "Hello",
   },
-
-  rotate: 0,
 };
 
 const imageSlice = createSlice({
@@ -35,7 +34,7 @@ const imageSlice = createSlice({
 
     updateImageFilters: (state, action) => {
       const { filterName, value } = action.payload;
-      state.filters[filterName] = { value };
+      state.filters[filterName] = value;
     },
 
     resetImageOptions: (state) => {
