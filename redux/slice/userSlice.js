@@ -14,8 +14,12 @@ const userSlice = createSlice({
     toggleActiveAuthType: (state, action) => {
       state.isLoggedIn = action.payload;
     },
+
+    updateUser: (state, action) => {
+      state.user = action.payload;
+    },
   },
 });
 
-export const { toggleActiveAuthType } = userSlice.actions;
+export const { toggleActiveAuthType, updateUser } = userSlice.actions;
 export default userSlice.reducer;

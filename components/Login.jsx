@@ -14,7 +14,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { toggleActiveAuthType } from "@/redux/slice/userSlice";
+import { toggleActiveAuthType, updateUser } from "@/redux/slice/userSlice";
 import { useDispatch } from "react-redux";
 import Cookies from "js-cookie";
 
@@ -40,6 +40,7 @@ const Login = () => {
 
   function onSubmit(values) {
     dispatch(toggleActiveAuthType(true));
+    dispatch(updateUser(values));
     Cookies.set("isLoggedIn", true, { expires: 7 });
   }
 
@@ -56,7 +57,7 @@ const Login = () => {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="shadcn" {...field} />
+                    <Input placeholder="Your email address" {...field} />
                   </FormControl>
 
                   <FormMessage />
@@ -70,7 +71,7 @@ const Login = () => {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input placeholder="shadcn" {...field} />
+                    <Input placeholder="Your password" {...field} />
                   </FormControl>
 
                   <FormMessage />
