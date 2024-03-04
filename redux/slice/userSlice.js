@@ -1,3 +1,5 @@
+"use client";
+
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
@@ -9,8 +11,8 @@ const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    toggleActiveAuthType: (state) => {
-      state.isLoggedIn = !state.isLoggedIn;
+    toggleActiveAuthType: (state, action) => {
+      state.isLoggedIn = action.payload;
     },
   },
 });

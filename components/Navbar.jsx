@@ -1,6 +1,14 @@
 "use client";
 
+import { toggleActiveAuthType } from "@/redux/slice/userSlice";
+import { Button } from "./ui/button";
+import Cookies from "js-cookie";
+import { useDispatch } from "react-redux";
+import { resetImageOptions } from "@/redux/slice/imageSlice";
+
 const Navbar = () => {
+  const dispatch = useDispatch();
+
   return (
     <nav className="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
       <div className="px-3 py-3 lg:px-5 lg:pl-3">
@@ -29,28 +37,24 @@ const Navbar = () => {
               </svg>
             </button>
             <a href="https://flowbite.com" className="flex ms-2 md:me-24">
-              <img
-                src="https://flowbite.com/docs/images/logo.svg"
-                className="h-8 me-3"
-                alt="FlowBite Logo"
-              />
-              <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">
-                Flowbite
+              <span className="self-center font-poppins text-xl font-black sm:text-2xl whitespace-nowrap dark:text-white">
+                ImagiCraft
               </span>
             </a>
           </div>
           <div className="flex items-center">
             <div className="flex items-center ms-3">
               <div>
-                <button
-                  type="button"
-                  className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
-                  aria-expanded="false"
-                  data-dropdown-toggle="dropdown-user"
+                <Button
+                  className="font-outfit text-[15px]"
+                  onClick={() => {
+                    dispatch(toggleActiveAuthType(false));
+                    dispatch(resetImageOptions());
+                    Cookies.remove("isLoggedIn");
+                  }}
                 >
-                  <span className="sr-only">Open user menu</span>
-                  <div className="w-5 h-5 rounded-full bg-black"></div>
-                </button>
+                  Logout
+                </Button>
               </div>
               <div
                 className="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded shadow dark:bg-gray-700 dark:divide-gray-600"

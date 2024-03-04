@@ -16,53 +16,68 @@ import {
 import { Input } from "@/components/ui/input";
 import { toggleActiveAuthType } from "@/redux/slice/userSlice";
 import { useDispatch } from "react-redux";
+import Cookies from "js-cookie";
 
 const Login = () => {
   const dispatch = useDispatch();
 
   const formSchema = z.object({
-    username: z.string().min(2, {
-      message: "Username must be at least 2 characters.",
+    email: z.string().email({
+      message: "Invalid email address.",
+    }),
+    password: z.string().min(8, {
+      message: "Password must be at least 8 characters.",
     }),
   });
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
+      email: "",
+      password: "",
     },
   });
 
   function onSubmit(values) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-    dispatch(toggleActiveAuthType());
+    dispatch(toggleActiveAuthType(true));
+    Cookies.set("isLoggedIn", true, { expires: 7 });
   }
 
   return (
     <div className="w-full h-screen flex flex-col items-center justify-center">
-      <div className="boxshadow_default w-auto">
-        <h1 className="font-poppins text-3xl font-bold">Login</h1>
+      <div className="boxshadow_default w-[500px] p-4 rounded-lg font-outfit ">
+        <h1 className="font-poppins text-3xl font-bold mb-6">Login</h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <FormField
               control={form.control}
-              name="username"
+              name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Username</FormLabel>
+                  <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input placeholder="shadcn" {...field} />
                   </FormControl>
-                  <FormDescription>
-                    This is your public display name.
-                  </FormDescription>
+
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit">Submit</Button>
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input placeholder="shadcn" {...field} />
+                  </FormControl>
+
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit">Login</Button>
           </form>
         </Form>
       </div>

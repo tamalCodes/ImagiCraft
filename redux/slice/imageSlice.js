@@ -42,6 +42,7 @@ const imageSlice = createSlice({
       state.textOverlay = initialState.textOverlay;
       state.textOverlayOptions = initialState.textOverlayOptions;
       state.rotate = initialState.rotate;
+      state.url = initialState.url;
     },
 
     toggleTextOverlay: (state) => {
